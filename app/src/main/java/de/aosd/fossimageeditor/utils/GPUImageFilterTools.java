@@ -165,14 +165,6 @@ public class GPUImageFilterTools {
                 bottomSheetDialog.cancel();
             }
         });
-        LinearLayout menu_filter_sketch = dialogView.findViewById(R.id.menu_filter_sketch);
-        menu_filter_sketch.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                listener.onGpuImageFilterChosenListener(createFilterForType(context, FilterType.SKETCH));
-                bottomSheetDialog.cancel();
-            }
-        });
         LinearLayout menu_filter_invert = dialogView.findViewById(R.id.menu_filter_invert);
         menu_filter_invert.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -213,12 +205,20 @@ public class GPUImageFilterTools {
                 bottomSheetDialog.cancel();
             }
         });
+        LinearLayout menu_filter_pixel = dialogView.findViewById(R.id.menu_filter_pixelation);
+        menu_filter_pixel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                listener.onGpuImageFilterChosenListener(createFilterForType(context, FilterType.PIXELATION));
+                bottomSheetDialog.cancel();
+            }
+        });
 
         bottomSheetDialog.setContentView(dialogView);
         bottomSheetDialog.show();
     }
 
-    public static GPUImageFilter createFilterForType(final Context context, final FilterType type) {
+    private static GPUImageFilter createFilterForType(final Context context, final FilterType type) {
         switch (type) {
             case CONTRAST:
                 return new GPUImageContrastFilter(2.0f);
@@ -329,7 +329,6 @@ public class GPUImageFilterTools {
                 return createBlendFilter(context, GPUImageChromaKeyBlendFilter.class);
             case BLEND_NORMAL:
                 return createBlendFilter(context, GPUImageNormalBlendFilter.class);
-
             case GAUSSIAN_BLUR:
                 return new GPUImageGaussianBlurFilter();
             case CROSSHATCH:
@@ -407,12 +406,15 @@ public class GPUImageFilterTools {
     }
 
     public enum FilterType {
-        CONTRAST, GRAYSCALE, SHARPEN, SEPIA, SOBEL_EDGE_DETECTION, THREE_X_THREE_CONVOLUTION, FILTER_GROUP, EMBOSS, POSTERIZE, GAMMA, BRIGHTNESS, INVERT, HUE, PIXELATION,
-        SATURATION, EXPOSURE, HIGHLIGHT_SHADOW, MONOCHROME, OPACITY, RGB, WHITE_BALANCE, VIGNETTE, BLEND_COLOR_BURN, BLEND_COLOR_DODGE, BLEND_DARKEN, BLEND_DIFFERENCE,
-        BLEND_DISSOLVE, BLEND_EXCLUSION, BLEND_SOURCE_OVER, BLEND_HARD_LIGHT, BLEND_LIGHTEN, BLEND_ADD, BLEND_DIVIDE, BLEND_MULTIPLY, BLEND_OVERLAY, BLEND_SCREEN, BLEND_ALPHA,
-        BLEND_COLOR, BLEND_HUE, BLEND_SATURATION, BLEND_LUMINOSITY, BLEND_LINEAR_BURN, BLEND_SOFT_LIGHT, BLEND_SUBTRACT, BLEND_CHROMA_KEY, BLEND_NORMAL,
-        GAUSSIAN_BLUR, CROSSHATCH, BOX_BLUR, CGA_COLORSPACE, DILATION, KUWAHARA, RGB_DILATION, SKETCH, TOON, SMOOTH_TOON, BULGE_DISTORTION, GLASS_SPHERE, HAZE, LAPLACIAN, NON_MAXIMUM_SUPPRESSION,
-        SPHERE_REFRACTION, SWIRL, WEAK_PIXEL_INCLUSION, FALSE_COLOR, COLOR_BALANCE, LEVELS_FILTER_MIN, BILATERAL_BLUR, HALFTONE, TRANSFORM2D
+        CONTRAST, GRAYSCALE, SHARPEN, SEPIA, SOBEL_EDGE_DETECTION, THREE_X_THREE_CONVOLUTION, FILTER_GROUP, EMBOSS, POSTERIZE,
+        GAMMA, BRIGHTNESS, INVERT, HUE, PIXELATION, SATURATION, EXPOSURE, HIGHLIGHT_SHADOW, MONOCHROME, OPACITY, RGB,
+        WHITE_BALANCE, VIGNETTE, BLEND_COLOR_BURN, BLEND_COLOR_DODGE, BLEND_DARKEN, BLEND_DIFFERENCE, BLEND_DISSOLVE,
+        BLEND_EXCLUSION, BLEND_SOURCE_OVER, BLEND_HARD_LIGHT, BLEND_LIGHTEN, BLEND_ADD, BLEND_DIVIDE, BLEND_MULTIPLY,
+        BLEND_OVERLAY, BLEND_SCREEN, BLEND_ALPHA, BLEND_COLOR, BLEND_HUE, BLEND_SATURATION, BLEND_LUMINOSITY, BLEND_LINEAR_BURN,
+        BLEND_SOFT_LIGHT, BLEND_SUBTRACT, BLEND_CHROMA_KEY, BLEND_NORMAL, GAUSSIAN_BLUR, CROSSHATCH, BOX_BLUR, CGA_COLORSPACE,
+        DILATION, KUWAHARA, RGB_DILATION, SKETCH, TOON, SMOOTH_TOON, BULGE_DISTORTION, GLASS_SPHERE, HAZE, LAPLACIAN,
+        NON_MAXIMUM_SUPPRESSION, SPHERE_REFRACTION, SWIRL, WEAK_PIXEL_INCLUSION, FALSE_COLOR, COLOR_BALANCE, LEVELS_FILTER_MIN,
+        BILATERAL_BLUR, HALFTONE, TRANSFORM2D
     }
 
     public static class FilterAdjuster {

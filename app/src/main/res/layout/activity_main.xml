@@ -33,20 +33,51 @@
             android:layout_gravity="center"
             android:layout_width="fill_parent"
             android:layout_height="fill_parent"
-            android:layout_marginLeft="@dimen/fab_margin"
-            android:layout_marginRight="@dimen/fab_margin"
             android:layout_marginBottom="@dimen/fab_margin"
-            android:layout_above="@+id/seekBar"/>
+            android:layout_above="@+id/seekBarLayout"/>
 
-        <SeekBar
+        <RelativeLayout
+            android:id="@+id/seekBarLayout"
             android:layout_alignParentBottom="true"
-            android:id="@+id/seekBar"
             android:layout_width="match_parent"
             android:layout_height="56dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@android:color/black"
-            android:max="100" />
+            android:minHeight="56dp">
+
+            <ImageButton
+                android:layout_alignParentStart="true"
+                android:id="@+id/filterCancel"
+                android:layout_width="42dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|center_horizontal"
+                android:layout_marginBottom="4dp"
+                android:layout_marginTop="4dp"
+                android:background="?attr/actionBarItemBackground"
+                android:src="@drawable/action_cancel"/>
+
+            <SeekBar
+                android:id="@+id/seekBar"
+                android:layout_toStartOf="@+id/filterApply"
+                android:layout_toEndOf="@+id/filterCancel"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:background="@android:color/black"
+                android:max="100" />
+
+            <ImageButton
+                android:layout_alignParentEnd="true"
+                android:id="@+id/filterApply"
+                android:layout_width="42dp"
+                android:layout_height="match_parent"
+                android:gravity="center_vertical|center_horizontal"
+                android:layout_marginBottom="4dp"
+                android:layout_marginTop="4dp"
+                android:background="?attr/actionBarItemBackground"
+                android:src="@drawable/action_check"/>
+
+
+        </RelativeLayout>
+
+
 
     </RelativeLayout>
 

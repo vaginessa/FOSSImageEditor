@@ -40,15 +40,26 @@
     <string name="filter_weakPixel">Weak pixel inclusion</string>
     <string name="filter_halftone">Halftone</string>
     <string name="filter_invert">Invert</string>
-    <string name="filter_sketch">Sketch</string>
+    <string name="filter_pixelation">Pixel</string>
+
+    // Crop
+
+    <string name="crop_free">Free</string>
+    <string name="crop_11">1:1</string>
+    <string name="crop_43">4:3</string>
+    <string name="crop_169">16:9</string>
+    <string name="crop_34">3:4</string>
+    <string name="crop_916">9:16</string>
 
     // Dialog
 
     <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="dialog_share">Share using:</string>
+    <string name="dialog_load">PLease pick an image first.</string>
 
     <string name="dialog_save">This will overwrite the original image and delete the edited image. Proceed?</string>
+    <string name="dialog_save_ok">Image saved.</string>
     <string name="dialog_save_not">Could not save image.</string>
     <string name="dialog_load_not">Could not load image.</string>
     <string name="dialog_text_hint">Enter your text:</string>
@@ -79,6 +90,11 @@
 
         &lt;i>Following open source libraries or projects are used within this software:&lt;/i>&lt;br>&lt;br>
 
+        &lt;b>Android Image Cropper&lt;/b>&lt;br>
+        Apache License Version 2.0&lt;br>
+        ArthurHub&lt;br>
+        &lt;i>https://github.com/ArthurHub/Android-Image-Cropper&lt;/i>&lt;br>&lt;br>
+
         &lt;b>GpuImage for Android&lt;/b>&lt;br>
         Apache License Version 2.0&lt;br>
         CyberAgent&lt;br>
@@ -94,15 +110,11 @@
         SarthakDoshi04&lt;br>
         &lt;i>https://github.com/SarthakDoshi04/text-on-image&lt;/i>&lt;br>&lt;br>
 
-        &lt;b>uCrop&lt;/b>&lt;br>
-        Apache License Version 2.0&lt;br>
-        Yalantis&lt;br>
-        &lt;i>https://github.com/Yalantis/uCrop&lt;/i>&lt;br>&lt;br>
-
         &lt;b>Farbenkreis zur Symbolisierung des menschlichen Geistes- und Seelenlebens&lt;/b>&lt;br>
-        Gemeinfrei&lt;br>
-        Johann Wolfgang Goethe&lt;br>
-        &lt;i>https://de.wikipedia.org/wiki/Datei:Goethe,_Farbenkreis_zur_Symbolisierung_des_menschlichen_Geistes-_und_Seelenlebens,_1809.jpg#/media/File:Goethe,_Farbenkreis_zur_Symbolisierung_des_menschlichen_Geistes-_und_Seelenlebens,_1809.jpg&lt;/i>
+        Public Domain&lt;br>
+        Original uploader was the user Luestling on Wikipedia in German - Transferred from de.wikipedia
+        to Commons by Andrei Stroe using the CommonsHelper.&lt;br>
+        &lt;i>https://commons.wikimedia.org/w/index.php?curid=6011583&lt;/i>
 
     </string>
 

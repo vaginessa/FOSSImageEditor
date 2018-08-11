@@ -19,30 +19,9 @@ import de.aosd.fossimageeditor.R;
 
 public class FileUtil {
 
-    private static final File externalStorageDirectory = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
-    private static String storagePath = null;
-    private static final String mDefaultFolder = "FOSS_ImageEditor";
-
-    public static String getPath() {
-        return getPathStorage();
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    private static String getPathStorage() {
-
-        if(storagePath == null) {
-            storagePath = externalStorageDirectory.getAbsolutePath() + "/" + mDefaultFolder;
-            File file = new File(storagePath);
-            if(!file.exists()) {
-                file.mkdirs();
-            }
-        }
-        return storagePath;
-    }
-
     public static void copyFile (Context context, File source, File destination) {
 
-        if (source.exists() && destination.exists()) {
+        if (source.exists()) {
             try {
                 FileInputStream inStream = new FileInputStream(source);
                 FileOutputStream outStream = new FileOutputStream(destination);
