@@ -2,8 +2,11 @@
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="ContentDescription"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:animateLayoutChanges="true">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/appbar"
@@ -52,7 +55,7 @@
                 android:layout_marginBottom="4dp"
                 android:layout_marginTop="4dp"
                 android:background="?attr/actionBarItemBackground"
-                android:src="@drawable/action_cancel"/>
+                android:src="@drawable/action_cancel" />
 
             <SeekBar
                 android:id="@+id/seekBar"

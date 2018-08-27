@@ -1,6 +1,7 @@
 package de.aosd.fossimageeditor;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.Context;
@@ -8,6 +9,7 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -29,6 +31,8 @@ import com.sarthakdoshi.textonimage.TextOnImage;
 import com.theartofdev.edmodo.cropper.CropImage;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
@@ -42,12 +46,15 @@ import jp.co.cyberagent.android.gpuimage.GPUImage;
 import jp.co.cyberagent.android.gpuimage.GPUImageFilter;
 import jp.co.cyberagent.android.gpuimage.GPUImageView;
 
+
 @SuppressWarnings({"FieldCanBeLocal", "ResultOfMethodCallIgnored"})
 public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBarChangeListener,
         GPUImageView.OnPictureSavedListener {
 
     private String appName;
     private String fileName;
+    private String extension;
+    private String path;
     private String afterSaving;
 
     private Context context;
@@ -63,7 +70,6 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     private GPUImageFilterTools.FilterAdjuster mFilterAdjuster;
 
     private int applyFilterCount;
-    private int isSaved;
     private static final int REQUEST_CODE_PICK_IMAGE = 1;
     private static final int REQUEST_CODE_ASK_PERMISSIONS = 123;
 
@@ -158,11 +164,9 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 
         if (Intent.ACTION_SEND.equals(action) && type != null && type.startsWith("image/")) {
             uriSource = intent.getParcelableExtra(Intent.EXTRA_STREAM);
-            sourceImage = new File(Objects.requireNonNull(FileUtil.getPath(context, uriSource)));
             handleImage();
         } else if ("android.intent.action.EDIT".equals(action) && type != null && type.startsWith("image/")) {
             uriSource = intent.getData();
-            sourceImage = new File(Objects.requireNonNull(FileUtil.getPath(context, uriSource)));
             handleImage();
         }
     }
@@ -185,25 +189,77 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         }
     }
 
-    private void saveImage() {
-        if (editedImage != null) {
-            Bitmap bitmap = mGPUImageView.getGPUImage().getBitmapWithFilterApplied();
-            int imageWidth = bitmap.getWidth();
-            int imageHeight = bitmap.getHeight();
-            String folder = "FOSS_ImageEditor";
-            mGPUImageView.saveToPictures(folder, fileName, imageWidth, imageHeight, MainActivity.this);
-        } else {
-            MsgUtil.show(context, R.string.dialog_load);
+    @SuppressLint("StaticFieldLeak")
+    private class LongOperation extends AsyncTask<String, Void, String> {
+
+        private BottomSheetDialog dialog;
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES);
+            editedImage = new File(path, "FOSS_ImageEditor" + "/" + fileName);
+            editedImage.getParentFile().mkdirs();
+
+            FileOutputStream out = null;
+            try {
+                Bitmap bitmap = mGPUImageView.getGPUImage().getBitmapWithFilterApplied();
+                out = new FileOutputStream(editedImage);
+                bitmap.compress(Bitmap.CompressFormat.PNG, 100, out);
+            } catch (Exception e) {
+                e.printStackTrace();
+                afterSaving = "afterSaving_not";
+            } finally {
+                try {
+                    if (out != null) {
+                        out.flush();
+                        out.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String result) {
+            dialog.cancel();
+            Uri uri = Uri.fromFile(editedImage);
+            sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, uri));
+            onPictureSaved(uri);
+        }
+
+        @Override
+        protected void onPreExecute() {
+            dialog = new BottomSheetDialog(activity);
+            View dialogView = View.inflate(activity, R.layout.dialog_progress, null);
+            TextView textView = dialogView.findViewById(R.id.dialog_text);
+            textView.setText(context.getString(R.string.dialog_wait));
+            dialog.setContentView(dialogView);
+            dialog.show();
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
         }
     }
 
     private void applyFilter() {
         if (applyFilterCount == 0) {
-            Bitmap bitmap = mGPUImageView.getGPUImage().getBitmapWithFilterApplied();
-            mGPUImageView.setImage(bitmap);
-            mGPUImageView.setFilter(new GPUImageFilter());
-            applyFilterCount = 1;
-            applyFilter();
+
+            try {
+                Bitmap bitmap = mGPUImageView.getGPUImage().getBitmapWithFilterApplied();
+                mGPUImageView.setImage(bitmap);
+                mGPUImageView.setFilter(new GPUImageFilter());
+                applyFilterCount = 1;
+                applyFilter();
+
+            } catch (Exception e) {
+                e.printStackTrace();
+                MsgUtil.show(activity, R.string.dialog_save_not);
+            }
+
         } else {
             Bitmap bitmap = mGPUImageView.getGPUImage().getBitmapWithFilterApplied();
             mGPUImageView.setImage(bitmap);
@@ -214,16 +270,17 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         seekBar.setVisibility(View.INVISIBLE);
     }
 
-    @Override
     public void onPictureSaved(final Uri uri) {
         mGPUImageView.setFilter(new GPUImageFilter());
         mGPUImageView.setImage(editedImage);
         filterApply.setVisibility(View.INVISIBLE);
         filterCancel.setVisibility(View.INVISIBLE);
         seekBar.setVisibility(View.INVISIBLE);
-        isSaved = 1;
 
         switch (afterSaving) {
+            case "afterSaving_not":
+                MsgUtil.show(context, R.string.dialog_save_not);
+                break;
             case "afterSaving_share":
                 Intent sharingIntent = new Intent(Intent.ACTION_SEND);
                 sharingIntent.setType("image/*");
@@ -296,44 +353,37 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
                 break;
             }
         }
-    } 
+    }
 
     private void handleImage() {
 
-        File directory = new File(Environment.getExternalStorageDirectory() + "/Pictures/FOSS_ImageEditor/");
-        if (!directory.exists()) {
-            if (directory.mkdirs()) {
-                Log.d(appName, "Successfully created the parent dir:" + directory.getName());
-            } else {
-                Log.d(appName, "Failed to create the parent dir:" + directory.getName());
-            }
-        }
-
         if (uriSource != null) {
-            try {
-                String date = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault()).format(new Date());
 
-                fileName = date + ".jpg";
-                sourceImage = new File(Objects.requireNonNull(FileUtil.getPath(context, uriSource)));
-                editedImage = new File(Environment.getExternalStorageDirectory() + "/Pictures/FOSS_ImageEditor/" + fileName);
-                FileUtil.copyFile(context, sourceImage, editedImage);
+            String date = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault()).format(new Date());
+
+            try {
+
+                path = FileUtil.getPath(context, uriSource);
+                extension = path.substring(path.lastIndexOf("."));
+                fileName = date + extension;
+                sourceImage = new File(path);
 
                 applyFilterCount = 0;
-                isSaved = 0;
 
                 mGPUImageView.setFilter(new GPUImageFilter());
                 seekBar.setVisibility(View.INVISIBLE);
-                mGPUImageView.setImage(editedImage);
+                mGPUImageView.setImage(uriSource);
 
             } catch (Exception e) {
                 e.printStackTrace();
                 MsgUtil.show(activity, R.string.dialog_load_not);
             }
         } else {
-            //MsgUtil.show(activity, R.string.dialog_load_not);
+            MsgUtil.show(activity, R.string.dialog_load_not);
             Log.d(appName, "Something wrong");
         }
     }
+
 
     public void onActivityResult(final int requestCode, final int resultCode, final Intent data) {
 
@@ -408,14 +458,6 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
     }
 
     @Override
-    public void onBackPressed() {
-        if (isSaved == 0) {
-            editedImage.delete();
-        }
-        super.onBackPressed();
-    }
-
-    @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
@@ -423,17 +465,13 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
         int id = item.getItemId();
 
         if (id == R.id.action_edit) {
-            if (editedImage != null) {
-                GPUImageFilterTools.showDialog(activity, new GPUImageFilterTools.OnGpuImageFilterChosenListener() {
-                    @Override
-                    public void onGpuImageFilterChosenListener(final GPUImageFilter filter) {
-                        switchFilterTo(filter);
-                        mGPUImageView.requestRender();
-                    }
-                });
-            } else {
-                MsgUtil.show(context, R.string.dialog_load);
-            }
+            GPUImageFilterTools.showDialog(activity, new GPUImageFilterTools.OnGpuImageFilterChosenListener() {
+                @Override
+                public void onGpuImageFilterChosenListener(final GPUImageFilter filter) {
+                    switchFilterTo(filter);
+                    mGPUImageView.requestRender();
+                }
+            });
             return true;
         }
 
@@ -447,31 +485,32 @@ public class MainActivity extends AppCompatActivity implements SeekBar.OnSeekBar
 
         if (id == R.id.action_text) {
             afterSaving = "afterSaving_text";
-            saveImage();
+            new LongOperation().execute("");
             return true;
         }
 
         if (id == R.id.action_crop) {
             afterSaving = "afterSaving_crop";
-            saveImage();
+            new LongOperation().execute("");
             return true;
         }
 
         if (id == R.id.action_share) {
             afterSaving = "afterSaving_share";
-            saveImage();
+            new LongOperation().execute("");
             return true;
         }
 
         if (id == R.id.action_save) {
             afterSaving = "afterSaving_save";
-            saveImage();
+            //saveImage();
+            new LongOperation().execute("");
             return true;
         }
 
         if (id == R.id.action_overwrite) {
             afterSaving = "afterSaving_overwrite";
-            saveImage();
+            new LongOperation().execute("");
             return true;
         }
 

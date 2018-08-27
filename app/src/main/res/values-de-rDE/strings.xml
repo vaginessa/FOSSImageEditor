@@ -58,8 +58,10 @@
     <string name="dialog_cancel">Abbrechen</string>
     <string name="dialog_share">Teile mit:</string>
     <string name="dialog_load">Bitte zuerst ein Bild auswählen.</string>
+    <string name="dialog_wait">Bitte warte einen Moment.</string>
 
-    <string name="dialog_save">Dies wird das Originalbild ersetzen und das bearbeitete löschen. Fortfahren?</string>
+    <string name="dialog_save">Dies wird das Originalbild ersetzen und das bearbeitete Bild löschen.
+        Dabei kommt es zu einem Qualitätsverlust. Fortfahren?</string>
     <string name="dialog_save_ok">Bild gespeichert.</string>
     <string name="dialog_save_not">Konnte Bild nicht speichern.</string>
     <string name="dialog_load_not">Konnte Bild nicht laden.</string>

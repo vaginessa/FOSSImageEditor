@@ -56,9 +56,11 @@
     <string name="dialog_ok">OK</string>
     <string name="dialog_cancel">Cancel</string>
     <string name="dialog_share">Share using:</string>
-    <string name="dialog_load">PLease pick an image first.</string>
+    <string name="dialog_load">Please pick an image first.</string>
+    <string name="dialog_wait">Please wait a moment.</string>
 
-    <string name="dialog_save">This will overwrite the original image and delete the edited image. Proceed?</string>
+    <string name="dialog_save">This will overwrite the original image and delete the edited image.
+        This will cause a loose of quality. Proceed?</string>
     <string name="dialog_save_ok">Image saved.</string>
     <string name="dialog_save_not">Could not save image.</string>
     <string name="dialog_load_not">Could not load image.</string>
